@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math"
 	"net"
+	"sort"
 	"sync"
 )
 
@@ -103,8 +104,16 @@ func (i *Ipamer) AcquireChildPrefix(prefix *Prefix, length int) (*Prefix, error)
 		return nil, fmt.Errorf("given length:%d is not equal to existing child prefix length:%d", length, prefix.childPrefixLength)
 	}
 
+	// sort prefixes
+	sortedPrefixes := make([]string, 0, len(prefix.availableChildPrefixes))
+	for c := range prefix.availableChildPrefixes {
+		sortedPrefixes = append(sortedPrefixes, c)
+	}
+	sort.Strings(sortedPrefixes)
+
 	var child *Prefix
-	for c, available := range prefix.availableChildPrefixes {
+	for _, c := range sortedPrefixes {
+		available := prefix.availableChildPrefixes[c]
 		if !available {
 			continue
 		}
