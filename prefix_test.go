@@ -671,41 +671,9 @@ func TestPrefixDeepCopy(t *testing.T) {
 	require.False(t, &(p1.ips) == &(p2.ips))
 }
 
-func NewPostgres() (*sql, error) {
-	return NewPostgresStorage("localhost", "5433", "postgres", "password", "postgres", SSLModeDisable)
-}
-
 // interface for impls that support cleaning before each testrun
 type Cleanable interface {
 	cleanup() error
-}
-
-// extended sql interface
-type ExtendedSQL struct {
-	*sql
-}
-
-func NewPostgresWithCleanup() (*ExtendedSQL, error) {
-	s, err := NewPostgres()
-	if err != nil {
-		return nil, err
-	}
-
-	ext := &ExtendedSQL{
-		s,
-	}
-
-	return ext, nil
-}
-
-// cleanup database before test
-func (e *ExtendedSQL) cleanup() error {
-	tx := e.db.MustBegin()
-	_, err := e.db.Exec("TRUNCATE TABLE prefixes")
-	if err != nil {
-		return err
-	}
-	return tx.Commit()
 }
 
 type testMethod func(t *testing.T, ipam *ipamer)
@@ -746,6 +714,7 @@ func storageProviders() []StorageProvider {
 				return NewMemory()
 			},
 		},
+		/*
 		{
 			name: "Postgres",
 			provide: func() Storage {
@@ -756,5 +725,6 @@ func storageProviders() []StorageProvider {
 				return storage
 			},
 		},
+		*/
 	}
 }
