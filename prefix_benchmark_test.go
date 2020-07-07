@@ -24,25 +24,6 @@ func BenchmarkNewPrefixMemory(b *testing.B) {
 	ipam := New()
 	benchmarkNewPrefix(ipam, b)
 }
-func BenchmarkNewPrefixPostgres(b *testing.B) {
-	_, storage, err := startPostgres()
-	if err != nil {
-		panic(err)
-	}
-	defer storage.db.Close()
-	ipam := NewWithStorage(storage)
-	benchmarkNewPrefix(ipam, b)
-}
-func BenchmarkNewPrefixCockroach(b *testing.B) {
-	_, storage, err := startCockroach()
-	if err != nil {
-		panic(err)
-	}
-	defer storage.db.Close()
-	ipam := NewWithStorage(storage)
-	benchmarkNewPrefix(ipam, b)
-}
-
 func benchmarkAcquireIP(ipam Ipamer, cidr string, b *testing.B) {
 	p, err := ipam.NewPrefix(cidr)
 	if err != nil {
@@ -71,26 +52,6 @@ func BenchmarkAcquireIPMemory(b *testing.B) {
 	ipam := New()
 	benchmarkAcquireIP(ipam, "11.0.0.0/24", b)
 }
-func BenchmarkAcquireIPPostgres(b *testing.B) {
-	_, storage, err := startPostgres()
-	if err != nil {
-		panic(err)
-	}
-	defer storage.db.Close()
-	ipam := NewWithStorage(storage)
-	benchmarkAcquireIP(ipam, "10.0.0.0/16", b)
-}
-
-func BenchmarkAcquireIPCockroach(b *testing.B) {
-	_, storage, err := startCockroach()
-	if err != nil {
-		panic(err)
-	}
-	defer storage.db.Close()
-	ipam := NewWithStorage(storage)
-	benchmarkAcquireIP(ipam, "10.0.0.0/16", b)
-}
-
 func benchmarkAcquireChildPrefix(parentLength, childLength int, b *testing.B) {
 	ipam := New()
 	p, err := ipam.NewPrefix(fmt.Sprintf("192.168.0.0/%d", parentLength))
